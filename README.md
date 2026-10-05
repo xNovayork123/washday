@@ -1,9 +1,9 @@
 # Washday
 
-Reservas para la lavandería compartida del edificio: horario semanal por máquina (3 lavadoras, 2 secadoras), bloques de 1 hora y un panel de "Pickup watch" para la ropa que nadie ha recogido.
+Booking page for a building's shared laundry room: a weekly schedule per machine (3 washers, 2 dryers), 1-hour slots, and a "Pickup watch" panel for loads nobody has collected yet.
 
-Es una sola página (`index.html`), sin dependencias ni build. Las reservas se guardan en el `localStorage` del navegador, así que solo se ven en el dispositivo donde se hicieron.
+It's a single page (`index.html`) with no dependencies or build step. Bookings are stored in the browser's `localStorage`, so they only show up on the device where they were made.
 
-## Uso
+## Usage
 
-Abre `index.html` en el navegador, o publícalo con GitHub Pages (Settings → Pages → rama `main`, carpeta `/`).
+Open `index.html` in a browser, or publish it with GitHub Pages (Settings → Pages → branch `main`, folder `/`).
