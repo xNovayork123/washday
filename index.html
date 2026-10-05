@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#174b3d">
+  <title>Washday | Shared laundry room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #182521;
+      --muted: #77827c;
+      --line: #e3e8e1;
+      --paper: #f6f7f2;
+      --white: #fff;
+      --green: #174b3d;
+      --green-2: #dcece2;
+      --green-3: #31745b;
+      --coral: #dc7057;
+      --coral-pale: #fff0eb;
+      --yellow: #f1d37e;
+      --yellow-pale: #fbf5df;
+      --mono: "DM Mono", Consolas, monospace;
+      --sans: "Manrope", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 13px; }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 224px minmax(0, 1fr); }
+
+    .sidebar { background: var(--green); color: #f5f6ef; padding: 27px 17px 20px; display: flex; flex-direction: column; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 1px 10px 35px; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #8ca99b; border-radius: 11px 11px 11px 4px; color: var(--yellow); font-size: 18px; font-weight: 800; }
+    .brand-name { font-size: 17px; font-weight: 800; letter-spacing: 0; }
+    .brand-sub { color: #adc3b8; font: 10px var(--mono); margin-top: 3px; }
+    .nav-label { margin: 5px 10px 10px; color: #92b0a1; font: 10px var(--mono); text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 6px; color: #cedbd4; margin: 2px 0; font-size: 12px; }
+    button.nav-item { width: 100%; border: 0; background: transparent; text-align: left; cursor: pointer; }
+    .nav-item.active { background: #28614f; color: white; font-weight: 700; }
+    .nav-glyph { width: 17px; text-align: center; font-size: 15px; line-height: 1; }
+    .sidebar-bottom { margin-top: auto; padding: 17px 10px 2px; border-top: 1px solid #3b6b5b; color: #adc3b8; font-size: 11px; line-height: 1.6; }
+    .online-dot { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: #a9d59b; }
+
+    .main { min-width: 0; }
+    .topbar { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 0 35px; background: rgba(255,255,255,.7); border-bottom: 1px solid var(--line); }
+    .crumb { color: var(--muted); font-size: 11px; }
+    .crumb strong { color: var(--ink); font-weight: 700; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .local-tag { font: 10px var(--mono); color: var(--muted); }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: #f2d68e; color: #4a3c1f; font-size: 10px; font-weight: 800; }
+    .content { width: min(1350px, 100%); margin: 0 auto; padding: 30px 35px 44px; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 23px; }
+    .eyebrow { color: var(--green-3); font: 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    h1 { font-size: clamp(25px, 3vw, 34px); line-height: 1.15; letter-spacing: 0; margin: 7px 0 0; font-weight: 800; }
+    .subhead { color: var(--muted); font-size: 12px; margin-top: 7px; }
+    .primary { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 40px; padding: 0 15px; border: 0; border-radius: 5px; background: var(--green); color: white; font-weight: 700; cursor: pointer; transition: background .16s, transform .16s; }
+    .primary:hover { background: #23614e; transform: translateY(-1px); }
+    .primary .plus { font-size: 18px; line-height: 0; font-weight: 400; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
+    .stat { min-height: 76px; padding: 15px 17px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); display: flex; justify-content: space-between; align-items: center; }
+    .stat-label { color: var(--muted); font-size: 11px; }
+    .stat-value { margin-top: 5px; font-size: 23px; font-weight: 800; line-height: 1; }
+    .stat-note { color: var(--muted); font-size: 10px; text-align: right; line-height: 1.5; }
+    .stat-icon { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 50%; background: var(--green-2); color: var(--green); font-size: 15px; }
+    .stat.alert .stat-icon { background: var(--coral-pale); color: var(--coral); }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+    .panel { background: var(--white); border: 1px solid var(--line); border-radius: 6px; }
+    .schedule { min-width: 0; overflow: hidden; }
+    .panel-head { padding: 18px 20px 15px; border-bottom: 1px solid var(--line); }
+    .panel-title-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    h2 { font-size: 15px; margin: 0; font-weight: 800; }
+    .week-nav { display: flex; gap: 5px; align-items: center; }
+    .icon-btn { width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: white; cursor: pointer; font-size: 17px; }
+    .icon-btn:hover { background: var(--paper); }
+    .week-label { min-width: 128px; color: #46554e; text-align: center; font: 10px var(--mono); }
+    .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; margin-top: 16px; }
+    .day { padding: 8px 2px 7px; border: 1px solid transparent; border-radius: 4px; background: transparent; cursor: pointer; text-align: center; }
+    .day:hover { background: #f6f8f4; }
+    .day.selected { color: white; background: var(--green); }
+    .day-name { display: block; color: var(--muted); font: 9px var(--mono); text-transform: uppercase; }
+    .day.selected .day-name { color: #c5d8ce; }
+    .day-date { display: block; margin-top: 5px; font-size: 14px; font-weight: 800; }
+    .day.today:not(.selected) .day-date { color: var(--green-3); }
+    .machine-tabs { display: flex; align-items: center; gap: 5px; margin-top: 16px; }
+    .machine-tabs button { padding: 7px 11px; border: 1px solid var(--line); border-radius: 4px; background: white; color: #617068; font-size: 10px; font-weight: 700; cursor: pointer; }
+    .machine-tabs button.active { border-color: var(--green); background: var(--green); color: white; }
+    .machine-tabs .legend { margin-left: auto; color: var(--muted); font-size: 10px; }
+    .legend-dot { display: inline-block; width: 7px; height: 7px; margin: 0 5px 0 11px; border-radius: 50%; background: #70aa7f; }
+    .legend-dot.busy { background: var(--coral); }
+    .grid-wrap { overflow-x: auto; }
+    .availability { min-width: 610px; padding: 0 15px 16px; }
+    .grid-row { display: grid; grid-template-columns: 66px repeat(var(--machine-count), minmax(78px, 1fr)); gap: 5px; align-items: stretch; }
+    .grid-row.machine-head { position: sticky; top: 0; z-index: 1; padding: 12px 0 8px; background: white; }
+    .machine-head > div { color: #637169; text-align: center; font: 9px var(--mono); }
+    .machine-head .time-head { text-align: left; }
+    .time-label { padding: 0 4px; display: flex; align-items: flex-start; justify-content: flex-start; color: var(--muted); font: 9px var(--mono); transform: translateY(-4px); }
+    .slot { min-height: 39px; margin-bottom: 5px; padding: 5px 3px; border: 1px solid #dce9de; border-radius: 4px; background: #eff6ef; color: #39714c; cursor: pointer; text-align: center; transition: border-color .14s, background .14s; }
+    .slot:hover:not(:disabled) { border-color: #5b9970; background: #e3f0e4; }
+    .slot:disabled { cursor: default; }
+    .slot.open::after { content: "Open"; display: block; padding-top: 5px; font: 9px var(--mono); }
+    .slot.busy { background: #fbf3e6; border-color: #f0e3c5; color: #755e2e; }
+    .slot.busy .occupant { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; font-weight: 800; }
+    .slot.busy .unit { display: block; margin-top: 3px; color: #8b7c5b; font: 8px var(--mono); }
+    .slot.waiting { background: var(--coral-pale); border-color: #f4d1c8; color: #a9503c; }
+    .slot.expired { opacity: .46; background: #f1f2ef; border-color: #e8eae7; color: #8b928e; }
+    .grid-empty { padding: 32px; color: var(--muted); text-align: center; font-size: 12px; }
+
+    .right-rail { display: grid; gap: 14px; }
+    .pickup-panel { overflow: hidden; }
+    .pickup-head { padding: 17px 17px 13px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
+    .pickup-head h2 { font-size: 14px; }
+    .count { min-width: 21px; height: 21px; padding: 0 6px; display: grid; place-items: center; border-radius: 11px; background: var(--coral-pale); color: #a9503c; font: 10px var(--mono); }
+    .pickup-list { padding: 0 15px; }
+    .pickup-item { padding: 14px 2px; border-bottom: 1px solid #edf0eb; }
+    .pickup-item:last-child { border-bottom: 0; }
+    .pickup-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .pickup-name { font-size: 11px; font-weight: 800; }
+    .pickup-meta { margin-top: 4px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .status { white-space: nowrap; padding: 4px 6px; border-radius: 3px; background: var(--coral-pale); color: #a9503c; font: 8px var(--mono); text-transform: uppercase; }
+    .status.soon { background: var(--yellow-pale); color: #806729; }
+    .pickup-actions { display: flex; gap: 7px; margin-top: 10px; }
+    .small-btn { min-height: 27px; padding: 0 8px; border: 1px solid var(--line); border-radius: 4px; background: white; color: #536159; font-size: 9px; font-weight: 700; cursor: pointer; }
+    .small-btn:hover { background: var(--paper); }
+    .small-btn.done { color: var(--green-3); }
+    .empty-pickup { padding: 22px 8px 24px; color: var(--muted); text-align: center; font-size: 10px; line-height: 1.65; }
+    .empty-check { width: 31px; height: 31px; margin: 0 auto 9px; display: grid; place-items: center; border-radius: 50%; background: var(--green-2); color: var(--green-3); font-size: 15px; }
+    .note-panel { padding: 16px; background: #f9f3dd; border: 1px solid #eee2b9; border-radius: 6px; }
+    .note-head { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; }
+    .note-icon { color: #96782e; font-size: 14px; }
+    .note-panel p { margin: 8px 0 0; color: #726846; font-size: 10px; line-height: 1.6; }
+    .note-panel .note-small { margin-top: 10px; color: #8a7d55; font: 9px var(--mono); }
+    .activity { padding: 16px 17px; }
+    .activity h2 { font-size: 12px; }
+    .activity-line { display: flex; gap: 10px; margin-top: 14px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .activity-mark { width: 7px; height: 7px; flex: 0 0 7px; margin-top: 4px; border-radius: 50%; background: #79a986; }
+    .activity-line strong { color: #46554e; }
+    .toast { position: fixed; z-index: 5; bottom: 22px; left: 50%; transform: translate(-50%, 15px); padding: 11px 16px; border-radius: 5px; background: #213d32; color: white; font-size: 11px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    .modal-backdrop { position: fixed; z-index: 4; inset: 0; display: none; place-items: center; padding: 18px; background: rgba(21, 38, 31, .42); }
+    .modal-backdrop.open { display: grid; animation: fade-in .16s ease-out; }
+    .modal { width: min(420px, 100%); padding: 23px; border-radius: 7px; background: white; box-shadow: 0 20px 65px rgba(16, 35, 26, .2); animation: rise-in .2s ease-out; }
+    .modal-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .modal h2 { font-size: 19px; }
+    .modal-sub { margin: 6px 0 20px; color: var(--muted); font-size: 11px; }
+    .modal-close { width: 27px; height: 27px; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 20px; }
+    .field { display: grid; gap: 6px; margin: 13px 0; }
+    .field label { color: #526159; font-size: 10px; font-weight: 800; }
+    .field input, .field select { width: 100%; height: 39px; padding: 0 10px; border: 1px solid var(--line); border-radius: 4px; background: white; color: var(--ink); outline: none; }
+    .field input:focus, .field select:focus { border-color: #6da082; box-shadow: 0 0 0 3px #dcece2; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 21px; }
+    .cancel { min-height: 39px; padding: 0 13px; border: 1px solid var(--line); border-radius: 4px; background: white; cursor: pointer; font-weight: 700; }
+    .modal-error { min-height: 14px; color: #b04b38; font-size: 10px; }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 1050px) {
+      .app { grid-template-columns: 190px minmax(0, 1fr); }
+      .content { padding-right: 23px; padding-left: 23px; }
+      .topbar { padding: 0 23px; }
+      .layout { grid-template-columns: minmax(0, 1fr) 260px; gap: 12px; }
+    }
+    @media (max-width: 800px) {
+      .app { grid-template-columns: 58px minmax(0, 1fr); }
+      .sidebar { padding: 18px 8px; align-items: center; }
+      .brand { padding: 0 0 31px; }
+      .brand-mark { width: 35px; height: 35px; }
+      .brand-copy, .nav-label, .nav-text, .sidebar-bottom { display: none; }
+      .nav-item { width: 40px; height: 40px; justify-content: center; padding: 0; }
+      .nav-glyph { font-size: 17px; }
+      .content { padding: 24px 18px 35px; }
+      .topbar { height: 55px; padding: 0 18px; }
+      .layout { grid-template-columns: 1fr; }
+      .right-rail { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .note-panel { align-self: start; }
+    }
+    @media (max-width: 560px) {
+      .topbar-right { gap: 9px; }
+      .local-tag { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .content { padding: 21px 12px 30px; }
+      .page-head { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 17px; }
+      .page-head .primary { width: 100%; }
+      .stats { gap: 6px; margin-bottom: 14px; }
+      .stat { min-height: 69px; padding: 11px 9px; }
+      .stat-label { font-size: 9px; }
+      .stat-value { font-size: 20px; }
+      .stat-note { font-size: 8px; }
+      .stat-icon { display: none; }
+      .panel-head { padding: 15px 12px 12px; }
+      .week-label { min-width: 100px; font-size: 9px; }
+      .days { gap: 1px; }
+      .day-name { font-size: 8px; }
+      .day-date { font-size: 12px; }
+      .machine-tabs { flex-wrap: wrap; }
+      .machine-tabs button { padding: 7px 8px; font-size: 9px; }
+      .machine-tabs .legend { width: 100%; margin: 4px 0 0; }
+      .availability { padding-right: 10px; padding-left: 10px; }
+      .right-rail { grid-template-columns: 1fr; }
+      .field-grid { grid-template-columns: 1fr; gap: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">w</div>
+        <div class="brand-copy"><div class="brand-name">washday</div><div class="brand-sub">YOUR BUILDING, IN SYNC</div></div>
+      </div>
+      <div class="nav-label">Laundry room</div>
+      <button class="nav-item active" data-scroll="#schedule-panel" aria-current="page"><span class="nav-glyph" aria-hidden="true">▦</span><span class="nav-text">Schedule</span></button>
+      <button class="nav-item" data-scroll="#pickup-panel"><span class="nav-glyph" aria-hidden="true">◷</span><span class="nav-text">Pickup watch</span></button>
+      <div class="sidebar-bottom"><span class="online-dot"></span>Maple House<br>Room 01 · Ground floor</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb">Maple House <span aria-hidden="true">/</span> <strong>Laundry room</strong></div>
+        <div class="topbar-right"><span class="local-tag">SAVED ON THIS DEVICE</span><span class="avatar" aria-label="Resident profile">ER</span></div>
+      </header>
+      <div class="content">
+        <section class="page-head">
+          <div><div class="eyebrow">Ground floor · Room 01</div><h1>Laundry, minus the wait.</h1><div class="subhead" id="today-label"></div></div>
+          <button class="primary" id="new-booking"><span class="plus" aria-hidden="true">+</span> Reserve a machine</button>
+        </section>
+
+        <section class="stats" aria-label="Today's laundry room summary">
+          <div class="stat"><div><div class="stat-label">Open today</div><div class="stat-value" id="open-count">--</div></div><div class="stat-note">machine<br>time slots</div><div class="stat-icon" aria-hidden="true">◷</div></div>
+          <div class="stat alert"><div><div class="stat-label">Waiting for pickup</div><div class="stat-value" id="waiting-count">--</div></div><div class="stat-note">needs a<br>clear machine</div><div class="stat-icon" aria-hidden="true">!</div></div>
+          <div class="stat"><div><div class="stat-label">Machines running</div><div class="stat-value" id="running-count">--</div></div><div class="stat-note">in the room<br>right now</div><div class="stat-icon" aria-hidden="true">↻</div></div>
+        </section>
+
+        <div class="layout">
+          <section class="panel schedule" id="schedule-panel" aria-labelledby="schedule-title">
+            <div class="panel-head">
+              <div class="panel-title-row">
+                <h2 id="schedule-title">Machine schedule</h2>
+                <div class="week-nav"><button class="icon-btn" id="prev-week" aria-label="Previous week" title="Previous week">‹</button><span class="week-label" id="week-label"></span><button class="icon-btn" id="next-week" aria-label="Next week" title="Next week">›</button></div>
+              </div>
+              <div class="days" id="days" aria-label="Choose a day"></div>
+              <div class="machine-tabs" id="machine-tabs" aria-label="Filter machine type">
+                <button class="active" data-filter="all">All machines</button><button data-filter="washer">Washers</button><button data-filter="dryer">Dryers</button>
+                <span class="legend"><span class="legend-dot"></span>Available<span class="legend-dot busy"></span>Reserved</span>
+              </div>
+            </div>
+            <div class="grid-wrap"><div class="availability" id="availability"></div></div>
+          </section>
+
+          <aside class="right-rail" aria-label="Pickup and room information">
+            <section class="panel pickup-panel" id="pickup-panel">
+              <div class="pickup-head"><h2>Pickup watch</h2><span class="count" id="pickup-badge">0</span></div>
+              <div class="pickup-list" id="pickup-list"></div>
+            </section>
+            <section class="note-panel">
+              <div class="note-head"><span class="note-icon" aria-hidden="true">✳</span>Keep the room moving</div>
+              <p>Set a pickup alarm when your cycle starts. If a machine is waiting, a friendly nudge goes a long way.</p>
+              <div class="note-small">QUIET HOURS · 10 PM – 7 AM</div>
+            </section>
+            <section class="panel activity"><h2>Room notes</h2><div class="activity-line"><span class="activity-mark"></span><span><strong>5 machines</strong> · 3 washers, 2 dryers</span></div><div class="activity-line"><span class="activity-mark"></span><span>Cycles book in <strong>1-hour blocks</strong></span></div></section>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="booking-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <form class="modal" id="booking-form">
+      <div class="modal-top"><div><h2 id="modal-title">Reserve a machine</h2><p class="modal-sub" id="modal-sub">Choose a free hour for your load.</p></div><button type="button" class="modal-close" id="close-modal" aria-label="Close">×</button></div>
+      <div class="field-grid">
+        <div class="field"><label for="machine">Machine</label><select id="machine" required></select></div>
+        <div class="field"><label for="booking-date">Date</label><input id="booking-date" type="date" required></div>
+      </div>
+      <div class="field-grid">
+        <div class="field"><label for="start-time">Start time</label><select id="start-time" required></select></div>
+        <div class="field"><label for="resident">Your name</label><input id="resident" maxlength="32" placeholder="e.g. Alex" required></div>
+      </div>
+      <div class="field"><label for="unit">Apartment</label><input id="unit" maxlength="12" placeholder="e.g. 4B" required></div>
+      <div class="modal-error" id="modal-error" role="alert"></div>
+      <div class="modal-actions"><button type="button" class="cancel" id="cancel-modal">Cancel</button><button class="primary" type="submit">Confirm reservation</button></div>
+    </form>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const machines = [
+        { id: "W1", name: "Washer 01", type: "washer" },
+        { id: "W2", name: "Washer 02", type: "washer" },
+        { id: "W3", name: "Washer 03", type: "washer" },
+        { id: "D1", name: "Dryer 01", type: "dryer" },
+        { id: "D2", name: "Dryer 02", type: "dryer" }
+      ];
+      const hours = Array.from({ length: 15 }, (_, index) => index + 7);
+      const storageKey = "washday-bookings-v1";
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let selectedDate = new Date(today);
+      let weekOffset = 0;
+      let filter = "all";
+      let toastTimer;
+      const $ = (selector) => document.querySelector(selector);
+      const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      const fromKey = (key) => { const [year, month, day] = key.split("-").map(Number); return new Date(year, month - 1, day); };
+      const plusDays = (date, count) => { const next = new Date(date); next.setDate(next.getDate() + count); return next; };
+      const hourLabel = (hour) => `${String(hour % 12 || 12).padStart(2, "0")}:00 ${hour < 12 ? "AM" : "PM"}`;
+      const dateTime = (key, hour) => { const date = fromKey(key); date.setHours(hour, 0, 0, 0); return date; };
+      const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+      const readBookings = () => {
+        try { const value = JSON.parse(localStorage.getItem(storageKey) || "[]"); return Array.isArray(value) ? value : []; }
+        catch { return []; }
+      };
+      let bookings = readBookings();
+      const save = () => { try { localStorage.setItem(storageKey, JSON.stringify(bookings)); } catch { showToast("Could not save in this browser."); } };
+      const machinesForView = () => machines.filter((machine) => filter === "all" || machine.type === filter);
+      const bookingAt = (key, machineId, hour) => bookings.find((booking) => booking.date === key && booking.machine === machineId && booking.start === hour && !booking.collected);
+      const reservationIsOver = (booking) => dateTime(booking.date, booking.start + 1).getTime() <= Date.now();
+      const reservationIsRunning = (booking) => dateTime(booking.date, booking.start).getTime() <= Date.now() && !reservationIsOver(booking);
+      const isFutureSlot = (key, hour) => dateTime(key, hour).getTime() >= Date.now();
+      const shortWeekday = new Intl.DateTimeFormat(undefined, { weekday: "short" });
+      const longDate = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" });
+      const monthDay = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" });
+
+      function renderDays() {
+        const monday = plusDays(today, -((today.getDay() + 6) % 7) + weekOffset * 7);
+        const sunday = plusDays(monday, 6);
+        $("#week-label").textContent = `${monthDay.format(monday)} – ${monthDay.format(sunday)}`;
+        $("#days").innerHTML = Array.from({ length: 7 }, (_, index) => {
+          const date = plusDays(monday, index);
+          const key = dateKey(date);
+          const classes = ["day", key === dateKey(selectedDate) ? "selected" : "", key === dateKey(today) ? "today" : ""].filter(Boolean).join(" ");
+          return `<button class="${classes}" data-date="${key}" aria-pressed="${key === dateKey(selectedDate)}"><span class="day-name">${shortWeekday.format(date)}</span><span class="day-date">${date.getDate()}</span></button>`;
+        }).join("");
+        $("#days").querySelectorAll(".day").forEach((button) => button.addEventListener("click", () => {
+          selectedDate = fromKey(button.dataset.date);
+          render();
+        }));
+      }
+
+      function renderSchedule() {
+        const key = dateKey(selectedDate);
+        const visible = machinesForView();
+        const chunks = [`<div class="grid-row machine-head" style="--machine-count:${visible.length}"><div class="time-head">TIME</div>${visible.map((machine) => `<div>${machine.id} · ${machine.type === "washer" ? "WASH" : "DRY"}</div>`).join("")}</div>`];
+        hours.forEach((hour) => {
+          const cells = visible.map((machine) => {
+            const booking = bookingAt(key, machine.id, hour);
+            if (booking) {
+              const overdue = reservationIsOver(booking);
+              return `<button class="slot busy ${overdue ? "waiting" : ""}" data-booking="${escapeHtml(booking.id)}" aria-label="${escapeHtml(machine.name)} reserved by ${escapeHtml(booking.name)}, apartment ${escapeHtml(booking.unit)}${overdue ? ", pickup overdue" : ""}" disabled><span class="occupant">${escapeHtml(booking.name)}</span><span class="unit">${escapeHtml(booking.unit)}${overdue ? " · PICKUP" : ""}</span></button>`;
+            }
+            const unavailable = !isFutureSlot(key, hour);
+            return `<button class="slot ${unavailable ? "expired" : "open"}" data-machine="${machine.id}" data-hour="${hour}" ${unavailable ? "disabled" : ""} aria-label="${hourLabel(hour)}, ${machine.name}, ${unavailable ? "past" : "available"}"></button>`;
+          }).join("");
+          chunks.push(`<div class="grid-row" style="--machine-count:${visible.length}"><div class="time-label">${hourLabel(hour)}</div>${cells}</div>`);
+        });
+        $("#availability").innerHTML = chunks.join("");
+        $("#availability").querySelectorAll(".slot.open").forEach((button) => button.addEventListener("click", () => openModal({ date: key, machine: button.dataset.machine, hour: Number(button.dataset.hour) })));
+      }
+
+      function renderPickup() {
+        const now = Date.now();
+        const current = bookings.filter((booking) => !booking.collected && dateTime(booking.date, booking.start + 1).getTime() <= now)
+          .sort((a, b) => dateTime(a.date, a.start + 1) - dateTime(b.date, b.start + 1));
+        const upcoming = bookings.filter((booking) => !booking.collected && !current.includes(booking) && dateTime(booking.date, booking.start + 1).getTime() - now <= 90 * 60 * 1000 && dateTime(booking.date, booking.start + 1).getTime() > now)
+          .sort((a, b) => dateTime(a.date, a.start + 1) - dateTime(b.date, b.start + 1));
+        const visible = [...current, ...upcoming].slice(0, 5);
+        $("#pickup-badge").textContent = String(current.length);
+        $("#waiting-count").textContent = String(current.length);
+        if (!visible.length) {
+          $("#pickup-list").innerHTML = `<div class="empty-pickup"><div class="empty-check">✓</div>All clear for now.<br>Cycles ending soon will show up here.</div>`;
+          return;
+        }
+        $("#pickup-list").innerHTML = visible.map((booking) => {
+          const overdue = current.includes(booking);
+          const when = overdue ? `Cycle ended ${booking.date === dateKey(today) ? "today" : longDate.format(fromKey(booking.date))} at ${hourLabel(booking.start + 1)}.` : `Cycle ends at ${hourLabel(booking.start + 1)}.`;
+          return `<article class="pickup-item"><div class="pickup-top"><div><div class="pickup-name">${escapeHtml(booking.name)} · Apt ${escapeHtml(booking.unit)}</div><div class="pickup-meta">${escapeHtml(booking.machine)} · ${when}</div></div><span class="status ${overdue ? "" : "soon"}">${overdue ? "Waiting" : "Soon"}</span></div><div class="pickup-actions"><button class="small-btn" data-nudge="${escapeHtml(booking.id)}">Copy a nudge</button>${overdue ? `<button class="small-btn done" data-collected="${escapeHtml(booking.id)}">Mark collected</button>` : ""}</div></article>`;
+        }).join("");
+        $("#pickup-list").querySelectorAll("[data-collected]").forEach((button) => button.addEventListener("click", () => {
+          const booking = bookings.find((item) => item.id === button.dataset.collected);
+          if (booking) { booking.collected = true; save(); render(); showToast("Machine marked as cleared."); }
+        }));
+        $("#pickup-list").querySelectorAll("[data-nudge]").forEach((button) => button.addEventListener("click", async () => {
+          const booking = bookings.find((item) => item.id === button.dataset.nudge);
+          if (!booking) return;
+          const message = `Hi ${booking.name}, your laundry cycle at ${booking.machine} has finished. When you get a moment, could you please collect it? Thanks!`;
+          try { await navigator.clipboard.writeText(message); showToast("Friendly pickup message copied."); }
+          catch { window.prompt("Copy this pickup message:", message); }
+        }));
+      }
+
+      function renderStats() {
+        const key = dateKey(today);
+        let open = 0;
+        let running = 0;
+        machines.forEach((machine) => hours.forEach((hour) => {
+          const booking = bookingAt(key, machine.id, hour);
+          if (!booking && isFutureSlot(key, hour)) open += 1;
+          if (booking && reservationIsRunning(booking)) running += 1;
+        }));
+        $("#open-count").textContent = String(open);
+        $("#running-count").textContent = String(running);
+        $("#today-label").textContent = `${longDate.format(today)} · ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date())}`;
+      }
+
+      function render() { renderDays(); renderSchedule(); renderPickup(); renderStats(); }
+
+      function openModal(prefill = {}) {
+        const machineSelect = $("#machine");
+        machineSelect.innerHTML = machines.map((machine) => `<option value="${machine.id}">${machine.name}</option>`).join("");
+        $("#booking-date").min = dateKey(today);
+        $("#booking-date").value = prefill.date || dateKey(selectedDate);
+        machineSelect.value = prefill.machine || machines[0].id;
+        $("#start-time").innerHTML = hours.map((hour) => `<option value="${hour}">${hourLabel(hour)} – ${hourLabel(hour + 1)}</option>`).join("");
+        $("#start-time").value = String(prefill.hour ?? hours.find((hour) => isFutureSlot(dateKey(selectedDate), hour)) ?? 7);
+        $("#modal-sub").textContent = `${longDate.format(fromKey($("#booking-date").value))} · One-hour reservation`;
+        $("#modal-error").textContent = "";
+        $("#booking-modal").classList.add("open");
+        $("#resident").focus();
+      }
+
+      function closeModal() { $("#booking-modal").classList.remove("open"); }
+      function showToast(message) {
+        const toast = $("#toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      $("#prev-week").addEventListener("click", () => { weekOffset -= 1; renderDays(); });
+      $("#next-week").addEventListener("click", () => { weekOffset += 1; renderDays(); });
+      $("#machine-tabs").querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
+        filter = button.dataset.filter;
+        $("#machine-tabs").querySelectorAll("button").forEach((tab) => tab.classList.toggle("active", tab === button));
+        renderSchedule();
+      }));
+      document.querySelectorAll("[data-scroll]").forEach((button) => button.addEventListener("click", () => {
+        document.querySelectorAll("[data-scroll]").forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("active", active);
+          if (active) item.setAttribute("aria-current", "page");
+          else item.removeAttribute("aria-current");
+        });
+        document.querySelector(button.dataset.scroll).scrollIntoView({ behavior: "smooth", block: "start" });
+      }));
+      $("#new-booking").addEventListener("click", () => openModal());
+      $("#close-modal").addEventListener("click", closeModal);
+      $("#cancel-modal").addEventListener("click", closeModal);
+      $("#booking-modal").addEventListener("click", (event) => { if (event.target === $("#booking-modal")) closeModal(); });
+      $("#booking-date").addEventListener("change", () => {
+        const selected = $("#booking-date").value;
+        if (selected) $("#modal-sub").textContent = `${longDate.format(fromKey(selected))} · One-hour reservation`;
+      });
+      document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeModal(); });
+      $("#booking-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const booking = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          date: $("#booking-date").value,
+          machine: $("#machine").value,
+          start: Number($("#start-time").value),
+          name: $("#resident").value.trim(),
+          unit: $("#unit").value.trim(),
+          collected: false
+        };
+        if (!booking.date || !booking.name || !booking.unit) { $("#modal-error").textContent = "Please fill in each field."; return; }
+        if (!isFutureSlot(booking.date, booking.start)) { $("#modal-error").textContent = "Choose a future time slot."; return; }
+        if (bookingAt(booking.date, booking.machine, booking.start)) { $("#modal-error").textContent = "That machine was just reserved. Choose another slot."; return; }
+        bookings.push(booking);
+        save();
+        selectedDate = fromKey(booking.date);
+        const dayDelta = Math.floor((selectedDate - today) / 86400000);
+        weekOffset = Math.floor((dayDelta - ((today.getDay() + 6) % 7)) / 7);
+        closeModal();
+        render();
+        showToast(`${machines.find((machine) => machine.id === booking.machine).name} reserved for ${booking.name}.`);
+      });
+
+      window.addEventListener("storage", (event) => {
+        if (event.key === storageKey) { bookings = readBookings(); render(); }
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>
