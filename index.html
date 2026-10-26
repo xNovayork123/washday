@@ -500,8 +500,10 @@
         return null;
       }
 
+      const weekMonday = () => plusDays(today, -((today.getDay() + 6) % 7) + weekOffset * 7);
+
       function renderDays() {
-        const monday = plusDays(today, -((today.getDay() + 6) % 7) + weekOffset * 7);
+        const monday = weekMonday();
         $("#week-label").textContent = `${monthDay.format(monday)} – ${monthDay.format(plusDays(monday, 6))}`;
         $("#days").innerHTML = Array.from({ length: 7 }, (_, index) => {
           const date = plusDays(monday, index);
@@ -774,8 +776,14 @@
         showToast("Calendar file downloaded. Open it to add the reminders.");
       }
 
-      $("#prev-week").addEventListener("click", () => { weekOffset -= 1; renderDays(); });
-      $("#next-week").addEventListener("click", () => { weekOffset += 1; renderDays(); });
+      // Moving to another week selects its Monday; the current week selects today instead.
+      function changeWeek(delta) {
+        weekOffset += delta;
+        selectedDate = weekOffset === 0 ? new Date(today) : weekMonday();
+        render();
+      }
+      $("#prev-week").addEventListener("click", () => changeWeek(-1));
+      $("#next-week").addEventListener("click", () => changeWeek(1));
       $("#machine-tabs").querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
         filter = button.dataset.filter;
         $("#machine-tabs").querySelectorAll("button").forEach((tab) => tab.classList.toggle("active", tab === button));
