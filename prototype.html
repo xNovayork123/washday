@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Washday Lo-fi Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #222;
+      --pencil: #555;
+      --faint: #999;
+      --paper: #fdfdfa;
+      --card: #fff;
+      --hi: #fff3a8;
+      --note: #2f5fa8;
+      --hand: "Kalam", "Comic Sans MS", cursive;
+      --sans: "Inter", "Segoe UI", sans-serif;
+    }
+    :root[data-theme="dark"] { --ink: #e8e8e4; --pencil: #bbb; --faint: #888; --paper: #1d1d1b; --card: #262624; --hi: #5a5320; --note: #8db4f0; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --ink: #e8e8e4; --pencil: #bbb; --faint: #888; --paper: #1d1d1b; --card: #262624; --hi: #5a5320; --note: #8db4f0; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+    .wrap { width: min(1180px, 100%); margin: 0 auto; padding: 40px 16px 64px; }
+    header { margin-bottom: 36px; }
+    .kicker { font: 600 12px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+    h1 { margin: 6px 0 8px; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; }
+    h2 { margin: 48px 0 14px; font-size: 22px; }
+    .lede { max-width: 720px; color: var(--pencil); }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .links a { padding: 7px 12px; border: 1.5px solid var(--ink); border-radius: 6px; color: var(--ink); font-weight: 600; font-size: 13px; text-decoration: none; }
+    .links a:hover { background: var(--hi); }
+
+    .framing { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .box { padding: 16px 18px; border: 1.5px solid var(--ink); border-radius: 8px; background: var(--card); }
+    .box h3 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); }
+    .box p { margin: 0; }
+
+    table { width: 100%; border-collapse: collapse; background: var(--card); border: 1.5px solid var(--ink); border-radius: 8px; overflow: hidden; font-size: 14px; }
+    th, td { padding: 11px 14px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); text-align: left; vertical-align: top; }
+    th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); }
+    tr:last-child td { border-bottom: 0; }
+    td .src { display: block; margin-top: 3px; color: var(--faint); font-size: 12px; }
+    td:first-child { width: 42%; }
+    .num { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 6px; border: 1.5px solid var(--ink); border-radius: 50%; font: 700 12px var(--hand); }
+
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-family: var(--hand); font-size: 17px; }
+    .flow span.step { padding: 4px 12px; border: 1.5px dashed var(--ink); border-radius: 18px; }
+    .flow span.arrow { color: var(--faint); }
+
+    .screens { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 28px 22px; align-items: start; }
+    figure { margin: 0; }
+    figcaption { margin-top: 12px; font-size: 13px; color: var(--pencil); }
+    figcaption strong { display: block; color: var(--ink); font-size: 14px; }
+    .phone { position: relative; max-width: 270px; min-height: 520px; margin: 0 auto; padding: 14px 12px 16px; border: 2.5px solid var(--ink); border-radius: 26px; background: var(--card); font-family: var(--hand); font-size: 14px; line-height: 1.3; }
+    .phone::before { content: ""; display: block; width: 60px; height: 6px; margin: 0 auto 12px; border-radius: 3px; background: var(--ink); opacity: .7; }
+    .wf-title { font-size: 19px; font-weight: 700; }
+    .wf-sub { color: var(--faint); font-size: 12px; }
+    .wf { margin-top: 9px; padding: 8px 9px; border: 1.5px solid var(--ink); border-radius: 7px; }
+    .wf.dash { border-style: dashed; }
+    .wf.fill { background: var(--ink); color: var(--card); }
+    .wf.hi { background: var(--hi); }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .btn { display: inline-block; padding: 3px 9px; border: 1.5px solid currentColor; border-radius: 5px; font-size: 12px; font-weight: 700; }
+    .btn.solid { background: var(--ink); color: var(--card); border-color: var(--ink); }
+    .tiny { font-size: 11px; color: var(--faint); }
+    .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 6px; }
+    .seg span { padding: 5px 2px; border: 1.5px solid var(--ink); border-radius: 5px; text-align: center; font-size: 11px; }
+    .seg span.on { background: var(--hi); font-weight: 700; }
+    .grid-mini { display: grid; grid-template-columns: 28px repeat(5, 1fr); gap: 3px; margin-top: 6px; font-size: 9px; }
+    .grid-mini i { height: 13px; border: 1px solid var(--faint); border-radius: 2px; }
+    .grid-mini i.b { background: repeating-linear-gradient(45deg, var(--faint) 0 1.5px, transparent 1.5px 5px); border-color: var(--ink); }
+    .grid-mini i.m { background: var(--hi); border-color: var(--ink); }
+    .grid-mini b { font-weight: 400; color: var(--faint); }
+    .line { height: 8px; margin-top: 5px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 18%, transparent); }
+    .line.short { width: 60%; }
+    .check { display: grid; place-items: center; width: 38px; height: 38px; margin: 6px 0; border: 2px solid var(--ink); border-radius: 50%; font-size: 20px; }
+    .pill { padding: 1px 7px; border: 1.5px solid var(--ink); border-radius: 10px; font-size: 10px; white-space: nowrap; }
+    .note { position: relative; margin-top: 10px; padding-left: 14px; color: var(--note); font-size: 13px; line-height: 1.35; }
+    .note::before { content: "↖"; position: absolute; left: 0; top: 0; }
+    .timeline { display: grid; grid-template-columns: 54px 1fr; gap: 6px 8px; margin-top: 6px; font-size: 12px; }
+    .timeline b { font-weight: 700; }
+
+    .next { padding: 18px 20px; border: 1.5px dashed var(--ink); border-radius: 8px; }
+    .next ul { margin: 6px 0 0; padding-left: 20px; }
+    footer { margin-top: 40px; color: var(--faint); font-size: 12px; }
+    @media (max-width: 700px) {
+      .framing { grid-template-columns: 1fr; }
+      td:first-child { width: auto; }
+      table, tbody, tr, td { display: block; }
+      thead { display: none; }
+      td { border-bottom: 0; padding-bottom: 4px; }
+      tr { border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); padding-bottom: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="kicker">GUI Design &amp; Web Optimization · Week 5 · Emiliano Velásquez López</div>
+      <h1>Washday: lo-fi prototype</h1>
+      <p class="lede">Washday helps residents of a building with a shared laundry room book a washer and a dryer back to back, and agree on what happens when laundry is left in a machine. These wireframes come from the Week 3 and 4 context mapping. The vibe-coded build follows them.</p>
+      <div class="links"><a href="./">Open the build →</a><a href="https://github.com/xNovayork123/washday">Codebase on GitHub</a></div>
+    </header>
+
+    <section class="framing" aria-label="Framing">
+      <div class="box"><h3>Problem statement</h3><p>Residents of a building with a shared laundry room spend long, unpredictable stretches of time waiting for occupied machines and for other residents to remove finished laundry. When a machine is busy, the wait often pushes their laundry into late-night hours, and they cannot plan their day around it.</p></div>
+      <div class="box"><h3>Design goal</h3><p>Residents can wash and dry their clothes at a time they have planned, without waiting for machines or for other residents to clear them.</p></div>
+    </section>
+
+    <h2>From findings to design decisions</h2>
+    <table>
+      <thead><tr><th>Finding</th><th>Design decision</th></tr></thead>
+      <tbody>
+        <tr><td><span class="num">1</span>A wash takes about 1.5 h and a dry 2–2.25 h. Without a slot for both, one participant finished at 4 am.<span class="src">Interview 1</span></td><td>Book a <strong>wash + dry</strong> as one load. The app finds a washer and a dryer that are free back to back and shows when you'll be done. Each slot is as long as the real cycle, not a fixed hour.</td></tr>
+        <tr><td><span class="num">2</span>When nothing is free, people wait or book "hasta altas horas de la noche".<span class="src">Interview 1</span></td><td>The home screen shows the <strong>next free wash + dry</strong>. If a day is full, the app points to the earliest free time. Cycles must end by 22:00 (quiet hours).</td></tr>
+        <tr><td><span class="num">3</span>The real pain is other people's finished laundry. Residents nudge in the group chat and sometimes threaten to take the clothes out.<span class="src">Interview 1</span></td><td>A <strong>Pickup watch</strong> with graduated steps: 15 min to collect, then a ready-made nudge, then the basket after 30 min.</td></tr>
+        <tr><td><span class="num">4</span>Shared resources work when there are clear rules, mutual monitoring and graduated sanctions. House rules already allow moving clothes to a basket.<span class="src">Ostrom (1990), Germany Handbook: Hausordnung</span></td><td><strong>Room rules, written down</strong> and visible next to the schedule, so nobody has to guess the unwritten ones (the original brief).</td></tr>
+        <tr><td><span class="num">5</span>Apps that notify residents when a cycle ends are spreading. My assumption about forgetting was <em>not</em> confirmed in the interview.<span class="src">Property Manager Insider · Interview 1</span></td><td>A lightweight <strong>calendar reminder</strong> (.ics) for the start and end of your cycle, without push infrastructure. Low priority until more interviews confirm it.</td></tr>
+        <tr><td><span class="num">6</span>Walk-ins sometimes grab a free machine on the spot.<span class="src">Interview 1</span></td><td>You can still book the slot that is starting now, so walk-ins stay visible to others.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Main flow</h2>
+    <div class="flow" aria-label="User flow">
+      <span class="step">Open app</span><span class="arrow">→</span><span class="step">See "next free wash + dry"</span><span class="arrow">→</span><span class="step">Plan a load</span><span class="arrow">→</span><span class="step">Booked + reminder</span><span class="arrow">→</span><span class="step">Cycle ends → collect</span><span class="arrow">→</span><span class="step">Not collected? Nudge → basket</span>
+    </div>
+
+    <h2>Wireframes</h2>
+    <div class="screens">
+      <figure>
+        <div class="phone" aria-label="Wireframe: home">
+          <div class="wf-title">Laundry room</div>
+          <div class="wf-sub">Maple House · Mon 26 Oct</div>
+          <div class="wf fill"><div class="tiny" style="color:inherit;opacity:.7">Next free wash + dry</div><div class="row"><b style="font-size:22px">Tue 07:00</b><span>→</span></div><div class="tiny" style="color:inherit;opacity:.7">done by 10:30</div></div>
+          <div class="row" style="margin-top:9px"><div class="wf" style="flex:1;margin:0">Waiting<br><b>2</b></div><div class="wf" style="flex:1;margin:0">Running<br><b>2</b></div></div>
+          <div class="wf dash">
+            <div class="row"><b>Schedule</b><span class="tiny">‹ 26 Oct – 1 Nov ›</span></div>
+            <div class="grid-mini" aria-hidden="true">
+              <b></b><b>W1</b><b>W2</b><b>W3</b><b>D1</b><b>D2</b>
+              <b>17</b><i class="b"></i><i></i><i></i><i></i><i></i>
+              <b>18</b><i class="b"></i><i class="b"></i><i></i><i class="b"></i><i></i>
+              <b>19</b><i></i><i class="b"></i><i></i><i class="b"></i><i class="b"></i>
+              <b>20</b><i class="m"></i><i></i><i class="b"></i><i></i><i class="b"></i>
+              <b>21</b><i class="m"></i><i></i><i class="b"></i><i></i><i></i>
+            </div>
+          </div>
+          <div class="wf"><b>My laundry</b><div class="line"></div><div class="line short"></div></div>
+          <div class="wf"><b>Pickup watch</b> <span class="pill">2</span><div class="line"></div></div>
+          <div style="margin-top:10px"><span class="btn solid">+ Plan a load</span></div>
+        </div>
+        <figcaption><strong>1 · Home</strong>The first answer you see is "when can I do a full load?" (findings 1, 2). Blocks in the schedule last as long as a real cycle.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone" aria-label="Wireframe: plan a load">
+          <div class="row"><span class="wf-title">Plan a load</span><span>✕</span></div>
+          <div class="wf-sub">We find a washer + dryer free back to back</div>
+          <div class="seg"><span class="on">Wash + dry<br>3 h 30</span><span>Wash<br>1 h 30</span><span>Dry<br>2 h</span></div>
+          <div class="row" style="margin-top:9px"><div class="wf" style="flex:1;margin:0">Date<br><b>Tue 27</b></div><div class="wf" style="flex:1;margin:0">Start<br><b>07:00 ▾</b></div></div>
+          <div class="wf hi">
+            <div class="row"><span>Washer 01</span><span>07:00–08:30</span></div>
+            <div class="row"><span>Dryer 01</span><span>08:30–10:30</span></div>
+            <div class="row" style="border-top:1.5px dashed var(--ink);margin-top:4px;padding-top:4px"><b>Collect by</b><b>10:45</b></div>
+          </div>
+          <div class="wf dash tiny">Day full? → "Earliest: Tomorrow 07:00 [Use it]"</div>
+          <div class="wf">Name <span class="tiny">(remembered)</span><div class="line"></div></div>
+          <div class="wf">Apartment<div class="line short"></div></div>
+          <div style="margin-top:10px;text-align:right"><span class="btn">Cancel</span> <span class="btn solid">Book it</span></div>
+        </div>
+        <figcaption><strong>2 · Plan a load</strong>You pick a time and the app picks the machines. The start-time list only shows times that work and says when you'll be done (findings 1, 2).</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone" aria-label="Wireframe: booked">
+          <div class="check">✓</div>
+          <div class="wf-title">You're booked.</div>
+          <div class="wf-sub">Tomorrow · shows under My laundry</div>
+          <div class="wf">
+            <div class="row"><span>Washer 01</span><span>07:00–08:30</span></div>
+            <div class="row"><span>Dryer 01</span><span>08:30–10:30</span></div>
+          </div>
+          <div class="wf hi"><b>⏰ Add pickup reminder</b><div class="tiny">calendar alert 10 min before + when done</div></div>
+          <div style="margin-top:10px;text-align:right"><span class="btn solid">Done</span></div>
+          <div class="wf dash" style="margin-top:22px"><b>My laundry</b>
+            <div class="row" style="margin-top:4px"><span>Washer 01</span><span class="pill">32 min left</span></div>
+            <div style="height:6px;border:1.5px solid var(--ink);border-radius:3px;margin-top:4px"><div style="width:60%;height:100%;background:var(--ink)"></div></div>
+            <div style="margin-top:6px"><span class="btn">Cancel</span> <span class="btn">Reminder</span></div>
+          </div>
+          <div class="note">Cancel frees the slot for neighbours (rule 5)</div>
+        </div>
+        <figcaption><strong>3 · Booked + My laundry</strong>Confirmation, an optional reminder (finding 5) and a countdown, so you can plan the rest of your day around the load.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone" aria-label="Wireframe: pickup watch">
+          <div class="row"><span class="wf-title">Pickup watch</span><span class="pill">2</span></div>
+          <div class="wf-sub">Finished loads nobody has collected</div>
+          <div class="wf"><div class="row"><b>Mia · 1B</b><span class="pill">Ready</span></div><div class="tiny">Dryer 01 · 14 min left to collect</div><div style="margin-top:5px"><span class="btn">Mark collected</span></div></div>
+          <div class="wf"><div class="row"><b>Sam · 4D</b><span class="pill">22 min</span></div><div class="tiny">Overdue · basket allowed in 8 min</div><div style="margin-top:5px"><span class="btn">Copy a nudge</span></div></div>
+          <div class="wf hi"><div class="row"><b>Jonas · 3C</b><span class="pill">61 min</span></div><div class="tiny" style="color:var(--ink)">Overdue · clothes can go to the basket</div><div style="margin-top:5px"><span class="btn">Nudge</span> <span class="btn solid">Moved to basket</span></div></div>
+          <div class="timeline">
+            <b>0 min</b><span>cycle ends → Ready</span>
+            <b>15 min</b><span>neighbours can nudge</span>
+            <b>30 min</b><span>basket is OK</span>
+          </div>
+          <div class="note">Replaces the "vengan a sacar su ropa" + threats in the group chat</div>
+        </div>
+        <figcaption><strong>4 · Pickup watch</strong>Graduated, visible steps instead of ad-hoc threats (findings 3, 4). The nudge text is ready to paste into the chat people already use.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone" aria-label="Wireframe: room rules">
+          <div class="wf-title">Room rules</div>
+          <div class="wf-sub">Written down so nobody has to guess</div>
+          <div class="wf hi">
+            <div>1. Book before you load</div>
+            <div>2. Collect within 15 min</div>
+            <div>3. After 15 min → nudge</div>
+            <div>4. After 30 min → basket</div>
+            <div>5. Can't make it? Cancel</div>
+          </div>
+          <div class="wf dash tiny">Quiet hours 22:00 – 07:00 · last cycle ends by 22:00</div>
+          <div class="wf"><b>Machines</b>
+            <div class="row tiny"><span>3 washers</span><span>1 h 30</span></div>
+            <div class="row tiny"><span>2 dryers</span><span>2 h</span></div>
+          </div>
+          <div class="note">Later: let the building edit these rules together (house meeting / vote)</div>
+        </div>
+        <figcaption><strong>5 · Room rules</strong>This links back to the original brief about unwritten household rules, and to Ostrom's clear-rules principle (finding 4).</figcaption>
+      </figure>
+    </div>
+
+    <h2>Open questions for the next iteration</h2>
+    <div class="next">
+      <ul>
+        <li>Interview 2 is still pending. Does someone who forgets their own laundry confirm the reminder feature?</li>
+        <li>Shared, real-time data: the build keeps bookings on one device (demo). A real building needs a shared backend and sign-in per apartment.</li>
+        <li>Should a resident who uses the basket often lose booking priority? That would be a graduated sanction, but it is risky socially.</li>
+        <li>Fixed Waschplan (German buildings) vs. free booking: support both?</li>
+      </ul>
+    </div>
+    <footer>Lo-fi wireframes are intentionally rough: grayscale, hand-drawn type, placeholder lines. The visual design lives in the build.</footer>
+  </div>
+</body>
+</html>
